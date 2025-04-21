@@ -164,32 +164,22 @@ def breadthFirstSearch(problem: SearchProblem) -> List[Directions]:
 def uniformCostSearch(problem: SearchProblem) -> List[Directions]:
     """Search the node of least total cost first."""
     "*** YOUR CODE HERE ***"
-    from util import PriorityQueue
+    Q = util.PriorityQueue()
+    closed = []
+    s = (problem.getStartState(), [], 0)  # (state, path, cost)
+    Q.push(s, 0)
 
-    frontier = PriorityQueue()
-    visited = set()
-    start_state = problem.getStartState()
-
-    # (state, path_so_far, cost_so_far)
-    frontier.push((start_state, [], 0), 0)
-
-    while not frontier.isEmpty():
-        current_state, path, cost = frontier.pop()
-
-        if current_state in visited:
-            continue
-
-        visited.add(current_state)
-
-        if problem.isGoalState(current_state):
+    while not Q.isEmpty():
+        (u, path, cost) = Q.pop()
+        if problem.isGoalState(u):
             return path
-
-        for successor, action, step_cost in problem.getSuccessors(current_state):
-            if successor not in visited:
-                new_path = path + [action]
-                new_cost = cost + step_cost
-                frontier.push((successor, new_path, new_cost), new_cost)
-
+        if u not in closed:
+            closed.append(u)
+            for v, action, step_cost in problem.getSuccessors(u):
+                newPath = path.copy()
+                newPath.append(action)
+                newCost = cost + step_cost
+                Q.push((v, newPath, newCost), newCost)
     return []
     # util.raiseNotDefined()
 
