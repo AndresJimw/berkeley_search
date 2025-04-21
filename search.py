@@ -90,12 +90,76 @@ def depthFirstSearch(problem: SearchProblem) -> List[Directions]:
     print("Start's successors:", problem.getSuccessors(problem.getStartState()))
     """
     "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    print("Start:", problem.getStartState())
+    print("Is the start a goal?", problem.isGoalState(problem.getStartState()))
+    print("Start's successors:", problem.getSuccessors(problem.getStartState()))
+    
+    closed = []
+    # Q= util.Queue()
+    Q= util.Stack()
+    s = (problem.getStartState(), [])
+    Q.push(s)
+    while not Q.isEmpty():
+        (u, path) = Q.pop()
+        if problem.isGoalState(u):
+            return path
+        if u not in closed:
+            closed.append(u)
+            for v, action, cost in problem.getSuccessors(u):
+                newPath = path.copy()
+                newPath.append(action)
+                Q.push((v, newPath))
+    return []
+    # from util import Stack
+
+    # # Initialize the stack with the starting state and an empty path
+    # frontier = Stack()
+    # frontier.push((problem.getStartState(), []))
+    
+    # # Set to keep track of visited states
+    # visited = set()
+
+    # while not frontier.isEmpty():
+    #     current_state, path = frontier.pop()
+        
+    #     # Check if current state is the goal
+    #     if problem.isGoalState(current_state):
+    #         return path
+        
+    #     if current_state not in visited:
+    #         visited.add(current_state)
+            
+    #         # Get all successors and add them to the frontier
+    #         for successor, action, _ in problem.getSuccessors(current_state):
+    #             if successor not in visited:
+    #                 new_path = path + [action]
+    #                 frontier.push((successor, new_path))
+    
+    # # Return empty list if no solution found (though Pacman mazes always have solutions)
+    # return []
+
+    # util.raiseNotDefined()    
 
 def breadthFirstSearch(problem: SearchProblem) -> List[Directions]:
     """Search the shallowest nodes in the search tree first."""
     "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    closed = []
+    Q= util.Queue()
+    # Q= util.Stack()
+    s = (problem.getStartState(), [])
+    Q.push(s)
+    while not Q.isEmpty():
+        (u, path) = Q.pop()
+        if problem.isGoalState(u):
+            return path
+        if u not in closed:
+            closed.append(u)
+            for v, action, cost in problem.getSuccessors(u):
+                newPath = path.copy()
+                newPath.append(action)
+                Q.push((v, newPath))
+    return []
+    # util.raiseNotDefined()
 
 def uniformCostSearch(problem: SearchProblem) -> List[Directions]:
     """Search the node of least total cost first."""
