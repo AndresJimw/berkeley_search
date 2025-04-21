@@ -205,32 +205,30 @@ def aStarSearch(problem: SearchProblem, heuristic=nullHeuristic) -> List[Directi
     "*** YOUR CODE HERE ***"
     from util import PriorityQueue
 
-    frontier = PriorityQueue()
-    visited = set()
     start_state = problem.getStartState()
+    frontier = PriorityQueue()
+    g_scores = {start_state: 0}
 
-    # (state, path_so_far, cost_so_far)
-    start_node = (start_state, [], 0)
-    start_priority = heuristic(start_state, problem)
-    frontier.push(start_node, start_priority)
+    # (state, path_so_far, g_score)
+    frontier.push((start_state, [], 0), heuristic(start_state, problem))
 
     while not frontier.isEmpty():
         current_state, path, cost = frontier.pop()
 
-        if current_state in visited:
-            continue
-
-        visited.add(current_state)
-
+        # Si encontramos el objetivo, devolvemos la solución
         if problem.isGoalState(current_state):
             return path
 
+        # Expandir solo si no hay mejor camino conocido
+        if g_scores[current_state] < cost:
+            continue  # ya tenemos un mejor camino registrado
+
         for successor, action, step_cost in problem.getSuccessors(current_state):
-            if successor not in visited:
-                new_path = path + [action]
-                new_cost = cost + step_cost
-                priority = new_cost + heuristic(successor, problem)
-                frontier.push((successor, new_path, new_cost), priority)
+            new_g = cost + step_cost
+            if successor not in g_scores or new_g < g_scores[successor]:
+                g_scores[successor] = new_g
+                f = new_g + heuristic(successor, problem)
+                frontier.push((successor, path + [action], new_g), f)
 
     return []
     # util.raiseNotDefined()
