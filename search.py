@@ -170,7 +170,7 @@ def uniformCostSearch(problem: SearchProblem) -> List[Directions]:
     Q.push(s, 0)
 
     while not Q.isEmpty():
-        (u, path, cost) = Q.pop()
+        (u, path, accumulated_cost) = Q.pop()
         if problem.isGoalState(u):
             return path
         if u not in closed:
@@ -178,7 +178,7 @@ def uniformCostSearch(problem: SearchProblem) -> List[Directions]:
             for v, action, step_cost in problem.getSuccessors(u):
                 newPath = path.copy()
                 newPath.append(action)
-                newCost = cost + step_cost
+                newCost = accumulated_cost + step_cost
                 Q.push((v, newPath, newCost), newCost)
     return []
     # util.raiseNotDefined()
@@ -200,15 +200,15 @@ def aStarSearch(problem: SearchProblem, heuristic=nullHeuristic) -> List[Directi
     Q.push(s, heuristic(s[0], problem))
 
     while not Q.isEmpty():
-        (u, path, cost) = Q.pop()
+        (u, path, accumulated_cost) = Q.pop()
         if problem.isGoalState(u):
             return path
-        if g_scores[u] < cost:
+        if g_scores[u] < accumulated_cost:
             continue
         for v, action, step_cost in problem.getSuccessors(u):
             newPath = path.copy()
             newPath.append(action)
-            newCost = cost + step_cost
+            newCost = accumulated_cost + step_cost
             if v not in g_scores or newCost < g_scores[v]:
                 g_scores[v] = newCost
                 f = newCost + heuristic(v, problem)
