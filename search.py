@@ -193,33 +193,26 @@ def nullHeuristic(state, problem=None) -> float:
 def aStarSearch(problem: SearchProblem, heuristic=nullHeuristic) -> List[Directions]:
     """Search the node that has the lowest combined cost and heuristic first."""
     "*** YOUR CODE HERE ***"
-    from util import PriorityQueue
+    Q = util.PriorityQueue()
+    g_scores = {}
+    s = (problem.getStartState(), [], 0)  # (state, path, cost)
+    g_scores[s[0]] = 0
+    Q.push(s, heuristic(s[0], problem))
 
-    start_state = problem.getStartState()
-    frontier = PriorityQueue()
-    g_scores = {start_state: 0}
-
-    # (state, path_so_far, g_score)
-    frontier.push((start_state, [], 0), heuristic(start_state, problem))
-
-    while not frontier.isEmpty():
-        current_state, path, cost = frontier.pop()
-
-        # Si encontramos el objetivo, devolvemos la solución
-        if problem.isGoalState(current_state):
+    while not Q.isEmpty():
+        (u, path, cost) = Q.pop()
+        if problem.isGoalState(u):
             return path
-
-        # Expandir solo si no hay mejor camino conocido
-        if g_scores[current_state] < cost:
-            continue  # ya tenemos un mejor camino registrado
-
-        for successor, action, step_cost in problem.getSuccessors(current_state):
-            new_g = cost + step_cost
-            if successor not in g_scores or new_g < g_scores[successor]:
-                g_scores[successor] = new_g
-                f = new_g + heuristic(successor, problem)
-                frontier.push((successor, path + [action], new_g), f)
-
+        if g_scores[u] < cost:
+            continue
+        for v, action, step_cost in problem.getSuccessors(u):
+            newPath = path.copy()
+            newPath.append(action)
+            newCost = cost + step_cost
+            if v not in g_scores or newCost < g_scores[v]:
+                g_scores[v] = newCost
+                f = newCost + heuristic(v, problem)
+                Q.push((v, newPath, newCost), f)
     return []
     # util.raiseNotDefined()
 
