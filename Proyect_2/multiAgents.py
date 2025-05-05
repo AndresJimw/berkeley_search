@@ -75,7 +75,41 @@ class ReflexAgent(Agent):
         newScaredTimes = [ghostState.scaredTimer for ghostState in newGhostStates]
 
         "*** YOUR CODE HERE ***"
-        return successorGameState.getScore()
+        # print("ACTION:", action)
+        # print("newPos:", newPos)
+        # print("newFood.asList():", newFood.asList())
+        # print("newGhostPositions:", [ghost.getPosition() for ghost in newGhostStates])
+        # print("newScaredTimes:", newScaredTimes)
+        
+        score = 0
+        
+        if action == Directions.STOP:
+            score -= 10 # Penalizar quedarse quieto
+            
+        for ghost in newGhostStates:
+            dist = manhattanDistance(newPos, ghost.getPosition())
+            if ghost.scaredTimer == 0:
+                if dist <= 1:
+                    score -= 200  # Muy cerca de fantasma no asustado
+                elif dist <= 3:
+                    score -= 10 / dist
+            else:
+                score += 5 / (dist + 1)  # Incentiva ir hacia fantasmas asustados
+                
+        foodList = newFood.asList()
+        if foodList:
+            foodDistances = [manhattanDistance(newPos, food) for food in foodList]
+            score += 10 / (min(foodDistances) + 1)  # Proximidad a comida
+            score += 100 / len(foodList) # Incentivar estados con menos comida
+            
+        score += successorGameState.getScore() # Agrega el puntaje base del estado
+        
+        currentPos = currentGameState.getPacmanPosition()
+        if newPos == currentPos:
+            score -= 50 # Penaliza por movimientos redundantes
+
+        return score
+        # return successorGameState.getScore()
 
 def scoreEvaluationFunction(currentGameState: GameState):
     """
