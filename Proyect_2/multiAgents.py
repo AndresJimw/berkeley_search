@@ -201,7 +201,50 @@ class AlphaBetaAgent(MultiAgentSearchAgent):
         Returns the minimax action using self.depth and self.evaluationFunction
         """
         "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+        def alphabeta(agentIndex, depth, state, alpha, beta):
+            # Corte si se alcanza profundidad o estado terminal
+            if state.isWin() or state.isLose() or depth == self.depth:
+                return self.evaluationFunction(state)
+
+            nextAgent = (agentIndex + 1) % state.getNumAgents()  # Siguiente agente
+            nextDepth = depth + 1 if nextAgent == 0 else depth   # Aumenta solo si vuelve a Pacman
+
+            actions = state.getLegalActions(agentIndex)
+            if not actions:
+                return self.evaluationFunction(state)
+
+            if agentIndex == 0:  # Pacman (Max)
+                value = float('-inf')
+                for action in actions:
+                    successor = state.generateSuccessor(agentIndex, action)
+                    value = max(value, alphabeta(nextAgent, nextDepth, successor, alpha, beta))
+                    if value > beta:
+                        return value  # Poda beta
+                    alpha = max(alpha, value)
+                return value
+            else:  # Fantasma (Min)
+                value = float('inf')
+                for action in actions:
+                    successor = state.generateSuccessor(agentIndex, action)
+                    value = min(value, alphabeta(nextAgent, nextDepth, successor, alpha, beta))
+                    if value < alpha:
+                        return value  # Poda alpha
+                    beta = min(beta, value)
+                return value
+
+        # Elije acción con poda alfa-beta
+        bestAction = None
+        alpha, beta = float('-inf'), float('inf')
+        bestValue = float('-inf')
+        for action in gameState.getLegalActions(0):  # Acciones Pacman
+            successor = gameState.generateSuccessor(0, action)
+            value = alphabeta(1, 0, successor, alpha, beta)
+            if value > bestValue:
+                bestValue = value
+                bestAction = action
+            alpha = max(alpha, bestValue)
+        return bestAction
+        # util.raiseNotDefined()
 
 class ExpectimaxAgent(MultiAgentSearchAgent):
     """
